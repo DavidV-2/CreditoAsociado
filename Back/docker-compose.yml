@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver_credito
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=OpaSas2026!
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+    networks:
+      - credito_net
+
+  backend:
+    build: .
+    container_name: backend_credito
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=sqlserver://sqlserver:1433;database=CreditosSolidarios;user=sa;password=OpaSas2026!;encrypt=true;trustServerCertificate=true
+      - JWT_SECRET=tu_secreto_super_seguro_aqui
+      - PORT=3000
+      - NODE_ENV=development
+    depends_on:
+      - sqlserver
+    networks:
+      - credito_net
+
+volumes:
+  sql_data:
+
+networks:
+  credito_net:
+    driver: bridge

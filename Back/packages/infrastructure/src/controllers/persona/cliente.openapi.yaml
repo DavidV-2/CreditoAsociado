@@ -1,0 +1,68 @@
+components:
+  schemas:
+    ClienteInput:
+      type: object
+      required:
+        - documento
+        - nombres
+        - apellidos
+        - idTipoDocumento
+        - idTipoCliente
+      properties:
+        documento:
+          type: string
+        nombres:
+          type: string
+        apellidos:
+          type: string
+        idTipoDocumento:
+          type: integer
+        idTipoCliente:
+          type: integer
+
+    ClienteResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        documento:
+          type: string
+        nombres:
+          type: string
+        apellidos:
+          type: string
+        idTipoDocumento:
+          type: integer
+        idTipoCliente:
+          type: integer
+        fechaCreacion:
+          type: string
+          format: date-time
+
+paths:
+  /api/clientes:
+    post:
+      summary: Registra un nuevo cliente en el sistema
+      tags:
+        - Clientes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClienteInput'
+            example:
+              documento: "1001234567"
+              nombres: "Juan"
+              apellidos : "Perez"
+              idTipoDocumento: 1
+              idTipoCliente: 1
+      responses:
+        201:
+          description: Cliente insertado correctamente en la capa de persistencia.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteResponse'
+        400:
+          description: Error de validación en la estructura de la petición.

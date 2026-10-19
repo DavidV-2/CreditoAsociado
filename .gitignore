@@ -1,0 +1,13 @@
+# Entorno
+.env
+*.env
+
+# Dependencias
+node_modules/
+Back/node_modules/
+Front/node_modules/
+Front/CreditoAsociado/node_modules/
+
+# Builds
+dist/
+build/

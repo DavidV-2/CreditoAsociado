@@ -1,0 +1,51 @@
+<div class="dashboard-container">
+    <div class="page-title">
+        <h1>Resumen General</h1>
+        <p>Vista rápida de las métricas del sistema de créditos.</p>
+    </div>
+
+    @if (metrics$ | async; as metrics) {
+    <div class="metrics-grid">
+
+        <div class="metric-card card-blue">
+            <div class="card-icon">📊</div>
+            <div class="card-info">
+                <h3>Total Créditos</h3>
+                <p class="metric-value">{{ metrics.totalCreditos }}</p>
+            </div>
+        </div>
+
+        <div class="metric-card card-green">
+            <div class="card-icon">💰</div>
+            <div class="card-info">
+                <h3>Monto Total</h3>
+                <p class="metric-value">{{ metrics.montoTotal | currency:'COP':'symbol-narrow':'1.0-0' }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <h3>Créditos por Estado</h3>
+        <table class="modern-table">
+            <thead>
+                <tr>
+                    <th>Estado</th>
+                    <th>Cantidad</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (item of metrics.cantidadCreditosPorEstado; track item.estado) {
+                <tr>
+                    <td><span class="badge">{{ item.estado }}</span></td>
+                    <td class="font-bold">{{ item.cantidad }}</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    } @else {
+    <div class="loading-spinner">
+        <p>Cargando métricas reales...</p>
+    </div>
+    }
+</div>

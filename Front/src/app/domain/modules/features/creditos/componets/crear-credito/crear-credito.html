@@ -1,0 +1,82 @@
+<div class="page-header">
+  <h2>Crear Nuevo Crédito</h2>
+  <div class="action-buttons">
+
+    <button class="btn-secondary" onclick="window.open('http://localhost:3000/api-docs', '_blank')">
+      Ir a Swagger (Crear Cliente)
+    </button>
+    <button class="btn-secondary" routerLink="/creditos">Volver</button>
+  </div>
+</div>
+
+<div class="form-container">
+
+
+  <div class="alert-info">
+    <h4>⚠️ Recuerda registrar el Cliente primero</h4>
+    
+    <p class="small-text">Una vez creado el cliente en Swagger, vuelve aquí y usa el mismo documento para crear el crédito.</p>
+  </div>
+
+  <div *ngIf="successMessage" class="alert-success">
+    {{ successMessage }}
+  </div>
+  <div *ngIf="errorMessage" class="alert-error">
+    {{ errorMessage }}
+  </div>
+
+  <form (ngSubmit)="guardar()" #formCredito="ngForm">
+    
+    <div class="form-row">
+      <div class="form-group">
+        <label>Documento del Asociado</label>
+        <input type="text" name="documento" [(ngModel)]="nuevoCredito.identificacionAsociado" required placeholder="Ej: 1001234567" />
+      </div>
+      <div class="form-group">
+        <label>Nombre Completo</label>
+        <input type="text" name="nombre" [(ngModel)]="nuevoCredito.nombreAsociado" required placeholder="Ej: Juan Pérez" />
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Tipo de Crédito</label>
+        <select name="tipo" [(ngModel)]="nuevoCredito.tipoCredito">
+          <option value="LIBRE_INVERSION">Libre Inversión</option>
+          <option value="VIVIENDA">Vivienda</option>
+          <option value="EDUCACION">Educación</option>
+          <option value="MICROCREDITO">Microcrédito</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Forma de Pago</label>
+        <select name="formaPago" [(ngModel)]="nuevoCredito.formaPago">
+          <option value="NOMINA">Nómina</option>
+          <option value="EFECTIVO">Efectivo</option>
+          <option value="DEBITO_AUTOMATICO">Débito Automático</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Valor Solicitado</label>
+        <input type="number" name="valor" [(ngModel)]="nuevoCredito.valorSolicitado" required placeholder="Ej: 15000000" />
+      </div>
+      <div class="form-group">
+        <label>Tasa de Interés (%)</label>
+        <input type="number" step="0.01" name="tasa" [(ngModel)]="nuevoCredito.tasaInteres" required />
+      </div>
+      <div class="form-group">
+        <label>Número de Cuotas</label>
+        <input type="number" name="cuotas" [(ngModel)]="nuevoCredito.numeroCuotas" required placeholder="Ej: 36" />
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-save" [disabled]="!formCredito.valid || guardando">
+        {{ guardando ? 'Guardando...' : 'Guardar Crédito' }}
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,116 @@
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+.page-header h2 { color: #0f172a; margin: 0 0 5px 0; font-size: 1.8rem; }
+.page-header p { color: #64748b; margin: 0; }
+
+.btn-secondary {
+  background: #e2e8f0;
+  color: #1e293b;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: none;
+  transition: 0.2s;
+}
+.btn-secondary:hover { background: #cbd5e1; }
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.full-width { grid-column: 1 / -1; }
+
+.card {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  border-top: 4px solid #3b82f6;
+}
+
+.header-card {
+  border-top: none;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  color: white;
+}
+
+.title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.title-row h3 { margin: 0; font-size: 1.8rem; }
+.header-card p { color: #94a3b8; margin: 0; font-size: 0.9rem; }
+
+.badge {
+  background: #38bdf8;
+  color: #0f172a;
+  padding: 6px 15px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.card h4 {
+  margin: 0 0 20px 0;
+  color: #0f172a;
+  font-size: 1.2rem;
+  border-bottom: 2px solid #f1f5f9;
+  padding-bottom: 10px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #f8fafc;
+}
+.info-row span { color: #64748b; font-weight: 500; }
+.info-row strong { color: #0f172a; }
+
+.highlight {
+  color: #10b981;
+  font-size: 1.2rem;
+}
+
+.loading, .error-msg {
+  text-align: center;
+  padding: 50px;
+  color: #64748b;
+  font-size: 1.2rem;
+  background: white;
+  border-radius: 12px;
+}
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  margin-top: 15px;
+}
+
+.history-table th {
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  padding: 12px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.history-table td {
+  padding: 12px;
+  border-bottom: 1px solid #e2e8f0;
+  color: #334155;
+}
+
+.bg-gray { background: #e2e8f0; color: #334155; }
+.no-history { text-align: center; color: #64748b; padding: 20px; }

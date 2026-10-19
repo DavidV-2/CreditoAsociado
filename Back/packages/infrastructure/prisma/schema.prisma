@@ -1,0 +1,202 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlserver"
+}
+
+// ==========================================
+// CATÁLOGOS
+// ==========================================
+
+model TipoCliente {
+  id            Int      @id @default(autoincrement())
+  codigo        String   @unique @db.VarChar(50) 
+  descripcion   String   @db.VarChar(100)
+  activo        Boolean  @default(true)
+  fechaRegistro DateTime @default(now())
+
+  clientes Cliente[]
+}
+
+model TipoDocumento {
+  id             Int      @id @default(autoincrement())
+  codigo         String   @unique @db.VarChar(20)  
+  descripcion    String   @db.VarChar(100)
+  activo         Boolean  @default(true)
+  fechaRegistro  DateTime @default(now())
+
+  clientes Cliente[]
+}
+
+model TipoCredito {
+  id            Int      @id @default(autoincrement())
+  codigo        String   @unique @db.VarChar(50)  
+  descripcion   String   @db.VarChar(100)
+  activo        Boolean  @default(true)
+  fechaRegistro DateTime @default(now())   
+
+  creditos CreditoAsociado[]
+}
+
+model EstadoCredito {
+  id            Int      @id @default(autoincrement())
+  codigo        String   @unique @db.VarChar(30) 
+  descripcion   String   @db.VarChar(100)
+  activo        Boolean  @default(true)
+  fechaRegistro DateTime @default(now())
+
+  creditos         CreditoAsociado[]
+  historialOrigen  HistorialCredito[] @relation("EstadoAnterior")
+  historialDestino HistorialCredito[] @relation("EstadoNuevo")
+}
+model MetodoPago {
+  id            Int      @id @default(autoincrement())
+  codigo        String   @unique @db.VarChar(50)  
+  descripcion   String   @db.VarChar(100)
+  activo        Boolean  @default(true)       
+  fechaRegistro DateTime @default(now())     
+
+  creditos CreditoAsociado[]
+}
+
+// ==========================================
+// ENTIDADES BASE
+// ==========================================
+
+model Cliente {
+  id              Int      @id @default(autoincrement())
+  documento       String   @db.VarChar(20)       
+  nombres         String   @db.VarChar(100)
+  apellidos       String   @db.VarChar(100)
+
+  idTipoDocumento Int
+  TipoDocumento   TipoDocumento @relation(fields: [idTipoDocumento], references: [id])
+
+  idTipoCliente   Int
+  TipoCliente     TipoCliente   @relation(fields: [idTipoCliente], references: [id])
+
+  activo          Boolean  @default(true)
+  fechaRegistro   DateTime @default(now())
+
+  creditos        CreditoAsociado[]
+
+  @@unique([idTipoDocumento, documento])
+  @@index([documento])
+}
+
+model Asesor {
+  id        Int     @id @default(autoincrement())
+  documento String  @unique @db.VarChar(20)
+  nombre    String  @db.VarChar(100)
+  activo    Boolean @default(true)
+
+  creditos  CreditoAsociado[]
+}
+
+// ==========================================
+// ENTIDAD PRINCIPAL
+// ==========================================
+
+model CreditoAsociado {
+  id                      Int     @id @default(autoincrement())
+  numeroCredito           String  @unique @db.VarChar(50)
+
+  identificacionAsociado  String  @db.VarChar(20)
+  nombreAsociado          String  @db.VarChar(150)
+
+  idCliente               Int
+  Cliente                 Cliente @relation(fields: [idCliente], references: [id])
+
+  idTipoCredito           Int                                  
+  TipoCredito             TipoCredito @relation(fields: [idTipoCredito], references: [id])
+
+  idFormaPago             Int                                  
+  FormaPago               MetodoPago @relation(fields: [idFormaPago], references: [id])
+
+  idEstadoCredito         Int
+  Estado                  EstadoCredito @relation(fields: [idEstadoCredito], references: [id])
+
+  idAsesor                Int?
+  Asesor                  Asesor? @relation(fields: [idAsesor], references: [id])
+
+  valorSolicitado         Decimal @db.Decimal(18, 2)
+  tasaInteres             Decimal @db.Decimal(9, 4)
+  numeroCuotas            Int
+
+  entidadId               Int     @default(1)
+
+  activo                  Boolean @default(true)
+  createdBy               String  @db.VarChar(100)
+  updatedBy               String? @db.VarChar(100)
+  fechaSolicitud          DateTime @default(now())
+  fechaActualizacion      DateTime @updatedAt
+
+  historial               HistorialCredito[]
+  webhookOutbox           WebhookOutbox[]
+
+  @@index([identificacionAsociado])
+  @@index([idEstadoCredito])
+  @@index([fechaSolicitud])
+  @@index([entidadId, idEstadoCredito])
+}
+
+// ==========================================
+// AUDITORÍA
+// ==========================================
+
+model HistorialCredito {
+  id               Int      @id @default(autoincrement())
+  idCredito        Int
+  Credito          CreditoAsociado @relation(fields: [idCredito], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  tipoCambio       String   @db.VarChar(30)
+
+  idEstadoAnterior Int?
+  EstadoAnterior   EstadoCredito? @relation("EstadoAnterior", fields: [idEstadoAnterior], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  
+  idEstadoNuevo    Int
+  EstadoNuevo      EstadoCredito @relation("EstadoNuevo", fields: [idEstadoNuevo], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  estadoAnterior   String?  @db.VarChar(30)
+  estadoNuevo      String   @db.VarChar(30)
+
+  usuario          String   @db.VarChar(100)
+  observacion      String?  @db.VarChar(500)
+  camposModificados String? @db.NVarChar(Max)  
+  fecha            DateTime @default(now())
+
+  @@index([idCredito, fecha])
+  @@index([tipoCambio])
+}
+
+// ==========================================
+// WEBHOOK
+// =========================================
+
+model WebhookOutbox {
+  id            Int      @id @default(autoincrement())
+  eventId       String   @unique @db.VarChar(36)
+  eventType     String   @db.VarChar(50)         
+  
+  idCredito     Int
+  Credito       CreditoAsociado @relation(fields: [idCredito], references: [id])
+
+  entidadId     Int      @default(1)                     
+
+  payload       String   @db.NVarChar(Max)
+  estado        String   @db.VarChar(20) @default("PENDIENTE")  
+  intentos      Int      @default(0)
+  ultimoError   String?  @db.NVarChar(Max)
+  
+
+  proximoIntento DateTime @default(now())                
+  fechaCreacion DateTime @default(now())
+  fechaEnvio    DateTime?
+
+  @@index([estado, fechaCreacion])
+  @@index([estado, proximoIntento])                      
+  @@index([entidadId])                                   
+}

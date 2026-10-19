@@ -1,0 +1,82 @@
+<div class="page-header">
+  <div>
+    <h2>Gestión de Créditos</h2>
+    <p>Administra los créditos registrados en el sistema.</p>
+  </div>
+  <button class="btn-primary" routerLink="/creditos/crear">+ Nuevo Crédito</button>
+</div>
+
+<!-- Contenedor de Filtros -->
+<div class="filters-container">
+  <div class="filter-item">
+    <label>Buscar</label>
+    <input type="text" [(ngModel)]="filtros.busqueda" (keyup.enter)="buscar()" placeholder="Nombre o N° Crédito" />
+  </div>
+  
+  <div class="filter-item">
+    <label>Documento</label>
+    <input type="text" [(ngModel)]="filtros.identificacionAsociado" (keyup.enter)="buscar()" placeholder="Identificación" />
+  </div>
+  
+  <div class="filter-item">
+    <label>Estado</label>
+    <select [(ngModel)]="filtros.estado" (change)="buscar()">
+      <option value="">Todos</option>
+      <option *ngFor="let est of estados" [value]="est">{{ est }}</option>
+    </select>
+  </div>
+
+  <div class="filter-buttons">
+    <button class="btn-search" (click)="buscar()">Buscar</button>
+    <button class="btn-clear" (click)="limpiarFiltros()">Limpiar</button>
+  </div>
+</div>
+
+<!-- Tabla -->
+<div class="table-container">
+  <table>
+    <thead>
+      <tr>
+        <th>N° Crédito</th>
+        <th>Asociado</th>
+        <th>Valor</th>
+        <th>Tipo</th>
+        <th>Estado</th>
+        <th>Fecha</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let c of creditos">
+        <td class="font-bold">{{ c.numeroCredito }}</td>
+        <td>{{ c.nombreAsociado }}</td>
+        <td class="font-bold">{{ (c.detalleFinanciero?.valorSolicitado || c.valorSolicitado) | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+        <td>{{ c.tipoCredito?.descripcion || 'N/A' }}</td>
+        <td>
+          <span class="badge" 
+                [ngClass]="{
+                  'badge-solicitado': c.estado?.codigo === 'SOLICITADO',
+                  'badge-aprobado': c.estado?.codigo === 'APROBADO'
+                }">
+            {{ c.estado?.codigo || 'DESCONOCIDO' }}
+          </span>
+        </td>
+        <td>{{ (c.cicloVida?.fechaSolicitud || c.fechaSolicitud) | date:'dd/MM/yyyy' }}</td>
+        <td>
+          <button class="btn-action" [routerLink]="['/creditos', c.id]">Ver Detalle</button>
+        </td>
+      </tr>
+      <tr *ngIf="creditos.length === 0 && !loading">
+        <td colspan="7" class="text-center" style="padding: 30px; color: #64748b;">
+          No se encontraron créditos con los filtros seleccionados.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="pagination" *ngIf="meta.totalPages > 1">
+  <button [disabled]="meta.page === 1" (click)="cambiarPagina(meta.page - 1)">Anterior</button>
+  <span>Página {{ meta.page }} de {{ meta.totalPages }}</span>
+  <button [disabled]="meta.page === meta.totalPages" (click)="cambiarPagina(meta.page + 1)">Siguiente</button>
+</div>

@@ -1,0 +1,23 @@
+<div class="app-container">
+  <aside class="sidebar">
+    <div class="logo">
+      <h2>OPA SAS</h2>
+      <span>Créditos Asociados</span>
+    </div>
+    <nav class="menu">
+      <a routerLink="/home" routerLinkActive="active">Dashboard</a>
+      <a routerLink="/creditos" routerLinkActive="active">Créditos</a>
+    </nav>
+    <div class="user-info">
+      <button class="btn-logout" (click)="logout()">Cerrar Sesión</button>
+    </div>
+  </aside>
+  <main class="main-content">
+    <header class="top-bar">
+      <h3>Panel de Administración</h3>
+    </header>
+    <div class="content-area">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,383 @@
+openapi: 3.0.3
+info:
+  title: API de Créditos Asociados
+  description: |
+    API REST para la gestión de créditos. Permite crear, consultar (con paginación y filtros), 
+    actualizar, cambiar estado y eliminar créditos.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000
+    description: Servidor local
+
+tags:
+  - name: Créditos
+    description: Operaciones sobre créditos asociados
+
+paths:
+  /api/creditos:
+    post:
+      tags: [Créditos]
+      summary: Crear un nuevo crédito
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CrearCreditoAsociadoDto'
+            example:
+              identificacionAsociado: "1001234567"
+              nombreAsociado: "Juan Perez"
+              tipoCredito: "LIBRE_INVERSION"
+              valorSolicitado: 15000000
+              tasaInteres: 1.5
+              numeroCuotas: 36
+              formaPago: "NOMINA"
+              estado: "SOLICITADO"
+              createdBy: "Admin"
+      responses:
+        '201':
+          description: Crédito creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditoAsociado'
+        '400':
+          description: Datos inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    get:
+      tags: [Créditos]
+      summary: Consultar créditos con paginación y filtros
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Número de página
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+            maximum: 100
+          description: Cantidad de resultados por página
+        - in: query
+          name: estado
+          schema:
+            type: string
+          description: Filtro por estado del crédito
+        - in: query
+          name: identificacion
+          schema:
+            type: string
+          description: Filtro por identificación del asociado
+        - in: query
+          name: q
+          schema:
+            type: string
+          description: Búsqueda por nombre o número de crédito
+        - in: query
+          name: ordenarPor
+          schema:
+            type: string
+            enum: [fechaSolicitud, valorSolicitado, estado]
+          description: Campo por el cual ordenar
+        - in: query
+          name: orden
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+          description: Dirección del ordenamiento
+      responses:
+        '200':
+          description: Lista paginada de créditos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultadoPaginadoCredito'
+        '400':
+          description: Parámetros inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/creditos/{id}:
+    get:
+      tags: [Créditos]
+      summary: Obtener un crédito por ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID del crédito
+      responses:
+        '200':
+          description: Crédito encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditoAsociado'
+        '404':
+          description: Crédito no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags: [Créditos]
+      summary: Actualizar la información de un crédito
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActualizarCreditoDto'
+      responses:
+        '200':
+          description: Crédito actualizado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditoAsociado'
+        '400':
+          description: Datos inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Crédito no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags: [Créditos]
+      summary: Eliminar (o realizar borrado lógico) de un crédito
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Crédito eliminado correctamente (sin contenido)
+        '404':
+          description: Crédito no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/creditos/{id}/estado:
+    patch:
+      tags: [Créditos]
+      summary: Cambiar el estado de un crédito
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                estado:
+                  type: string
+                  example: "APROBADO"
+              required:
+                - estado
+      responses:
+        '200':
+          description: Estado actualizado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditoAsociado'
+        '400':
+          description: Datos inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Crédito no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    CrearCreditoAsociadoDto:
+      type: object
+      required:
+        - identificacionAsociado
+        - nombreAsociado
+        - tipoCredito
+        - valorSolicitado
+        - tasaInteres
+        - numeroCuotas
+        - formaPago
+      properties:
+        identificacionAsociado:
+          type: string
+          example: "1001234567"
+        nombreAsociado:
+          type: string
+          example: "Juan Perez"
+        tipoCredito:
+          type: string
+          example: "LIBRE_INVERSION"
+        valorSolicitado:
+          type: number
+          format: double
+          example: 15000000
+        tasaInteres:
+          type: number
+          format: double
+          example: 1.5
+        numeroCuotas:
+          type: integer
+          example: 36
+        formaPago:
+          type: string
+          example: "NOMINA"
+        estado:
+          type: string
+          example: "PENDIENTE"
+        fechaSolicitud:
+          type: string
+          format: date-time
+        fechaActualizacion:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+          example: "Admin"
+
+    ActualizarCreditoDto:
+      type: object
+      description: Todos los campos son opcionales (actualización parcial)
+      properties:
+        nombreAsociado:
+          type: string
+          example: "Juan Perez Modificado"
+        valorSolicitado:
+          type: number
+          example: 20000000
+        formaPago:
+          type: string
+          example: "EFECTIVO"
+        estado:
+          type: string
+          example: "APROBADO"
+
+    CreditoAsociado:
+      type: object
+      properties:
+        id:
+          type: integer
+        numeroCredito:
+          type: string
+        identificacionAsociado:
+          type: string
+        nombreAsociado:
+          type: string
+        idCliente:
+          type: integer
+        cliente:
+          $ref: '#/components/schemas/Cliente'
+        detalleFinanciero:
+          $ref: '#/components/schemas/DetalleFinanciero'
+        cicloVida:
+          $ref: '#/components/schemas/CicloVidaCredito'
+
+    DetalleFinanciero:
+      type: object
+      properties:
+        valorSolicitado:
+          type: number
+        tasaInteres:
+          type: number
+        numeroCuotas:
+          type: integer
+
+    CicloVidaCredito:
+      type: object
+      properties:
+        fechaSolicitud:
+          type: string
+          format: date-time
+        fechaAprobacion:
+          type: string
+          format: date-time
+          nullable: true
+        fechaDesembolso:
+          type: string
+          format: date-time
+          nullable: true
+
+    Cliente:
+      type: object
+      properties:
+        id:
+          type: integer
+        documento:
+          type: string
+        nombres:
+          type: string
+        apellidos:
+          type: string
+
+    ResultadoPaginadoCredito:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreditoAsociado'
+        meta:
+          type: object
+          properties:
+            total:
+              type: integer
+              example: 50
+            page:
+              type: integer
+              example: 1
+            limit:
+              type: integer
+              example: 10
+            totalPages:
+              type: integer
+              example: 5
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Mensaje de error"

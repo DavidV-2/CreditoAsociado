@@ -1,0 +1,83 @@
+<div class="page-header">
+  <div>
+    <h2>Detalle del Crédito</h2>
+    <p>Información completa del crédito seleccionado.</p>
+  </div>
+  <button class="btn-secondary" routerLink="/creditos">Volver al Listado</button>
+</div>
+
+<div *ngIf="loading" class="loading">
+  Cargando información...
+</div>
+
+<div *ngIf="!loading && credito" class="detail-grid">
+  
+  <!-- Cabecera -->
+  <div class="card full-width header-card">
+    <div class="title-row">
+      <h3>{{ credito.numeroCredito }}</h3>
+      <span class="badge" 
+            [ngClass]="{
+              'badge-solicitado': credito.estado?.codigo === 'SOLICITADO',
+              'badge-aprobado': credito.estado?.codigo === 'APROBADO'
+            }">
+        {{ credito.estado?.codigo || 'SOLICITADO' }}
+      </span>
+    </div>
+    <p>Registrado el {{ credito.fechaSolicitud | date:'dd/MM/yyyy HH:mm' }}</p>
+  </div>
+
+  <!-- Datos del Asociado -->
+  <div class="card">
+    <h4>Datos del Asociado</h4>
+    <div class="info-row"><span>Nombre:</span> <strong>{{ credito.nombreAsociado }}</strong></div>
+    <div class="info-row"><span>Identificación:</span> <strong>{{ credito.identificacionAsociado }}</strong></div>
+    <div class="info-row"><span>Cliente:</span> <strong>{{ credito.Cliente?.nombres }} {{ credito.Cliente?.apellidos }}</strong></div>
+  </div>
+
+  <!-- Detalles Financieros -->
+  <div class="card">
+    <h4>Detalles Financieros</h4>
+
+    <div class="info-row"><span>Valor Solicitado:</span> <strong class="highlight">{{ credito.valorSolicitado | currency:'COP':'symbol-narrow':'1.0-0' }}</strong></div>
+    <div class="info-row"><span>Tasa de Interés:</span> <strong>{{ credito.tasaInteres }}%</strong></div>
+    <div class="info-row"><span>Número de Cuotas:</span> <strong>{{ credito.numeroCuotas }}</strong></div>
+    <div class="info-row"><span>Tipo de Crédito:</span> <strong>{{ credito.TipoCredito?.descripcion || 'N/A' }}</strong></div>
+  </div>
+
+  <!-- Historial de Cambios -->
+  <div class="card full-width" style="margin-top: 20px;">
+    <h4>Historial de Cambios</h4>
+    
+    <table class="history-table" *ngIf="historial && historial.length > 0; else noHistory">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Estado Anterior</th>
+          <th>Estado Nuevo</th>
+          <th>Usuario</th>
+          <th>Observación</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let h of historial">
+          <td>{{ h.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td><span class="badge bg-gray">{{ h.estadoAnterior || 'N/A' }}</span></td>
+          <td><span class="badge badge-aprobado">{{ h.estadoNuevo }}</span></td>
+          <td>{{ h.usuario }}</td>
+          <td>{{ h.observacion }}</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <ng-template #noHistory>
+      <p class="no-history">No hay cambios de estado registrados para este crédito.</p>
+    </ng-template>
+  </div>
+
+</div>
+
+
+<div *ngIf="!loading && !credito" class="error-msg">
+  No se encontró información del crédito.
+</div>
